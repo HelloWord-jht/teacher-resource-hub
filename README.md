@@ -399,7 +399,6 @@ docker compose config
 
 ```bash
 curl http://127.0.0.1:8080/api/web/home
-curl "http://127.0.0.1:8080/api/admin/dashboard"
 curl http://127.0.0.1:5173/api/web/home
 ```
 
