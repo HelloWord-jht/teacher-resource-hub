@@ -1,0 +1,98 @@
+:root {
+  color-scheme: light;
+  --bg-page: #f8fbff;
+  --bg-card: #ffffff;
+  --text-main: #0f172a;
+  --text-sub: #475569;
+  --line: #dbeafe;
+  --blue: #2563eb;
+  --blue-dark: #1d4ed8;
+  --container-width: 1180px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family:
+    "PingFang SC",
+    "Hiragino Sans GB",
+    "Microsoft YaHei",
+    "Noto Sans SC",
+    sans-serif;
+  background: var(--bg-page);
+  color: var(--text-main);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  max-width: 100%;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+.page-container {
+  width: min(var(--container-width), calc(100% - 32px));
+  margin: 0 auto;
+}
+
+.section-block {
+  padding: 56px 0;
+}
+
+.section-title {
+  margin-bottom: 24px;
+}
+
+.section-title h2 {
+  margin: 0;
+  font-size: clamp(24px, 3vw, 34px);
+  color: #0f172a;
+}
+
+.section-title p {
+  margin: 10px 0 0;
+  color: #64748b;
+  line-height: 1.8;
+}
+
+.content-html {
+  color: #334155;
+  line-height: 1.9;
+}
+
+.content-html p {
+  margin: 0 0 14px;
+}
+
+.content-html ul {
+  margin: 0 0 16px;
+  padding-left: 20px;
+}
+
+@media (max-width: 768px) {
+  .page-container {
+    width: calc(100% - 24px);
+  }
+
+  .section-block {
+    padding: 40px 0;
+  }
+}

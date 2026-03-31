@@ -1,0 +1,7 @@
+package com.teacherresourcehub.mapper;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.teacherresourcehub.entity.Lead;
+
+public interface LeadMapper extends BaseMapper<Lead> {
+}

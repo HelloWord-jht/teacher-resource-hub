@@ -1,0 +1,166 @@
+.detailLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 24px;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.heroCard {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.92fr) minmax(0, 1.08fr);
+  gap: 20px;
+  background: #fff;
+  border-radius: 24px;
+  padding: 20px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  box-shadow: 0 18px 30px rgba(15, 23, 42, 0.06);
+}
+
+.coverWrap {
+  border-radius: 20px;
+  overflow: hidden;
+  background: #eff6ff;
+}
+
+.cover {
+  width: 100%;
+  height: 100%;
+  min-height: 360px;
+  object-fit: cover;
+  display: block;
+}
+
+.info h1 {
+  margin: 8px 0 12px;
+  font-size: clamp(28px, 4vw, 40px);
+  line-height: 1.2;
+  color: #0f172a;
+}
+
+.scene {
+  margin: 0;
+  color: #2563eb;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.summary {
+  margin: 0;
+  color: #334155;
+  line-height: 1.9;
+}
+
+.tagGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.metaGrid {
+  margin-top: 22px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.metaGrid div {
+  background: #f8fafc;
+  border-radius: 14px;
+  padding: 14px;
+}
+
+.metaGrid span {
+  display: block;
+  font-size: 12px;
+  color: #64748b;
+  margin-bottom: 6px;
+}
+
+.metaGrid strong {
+  color: #0f172a;
+}
+
+.heroActions {
+  margin-top: 22px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.sectionCard {
+  border-radius: 20px !important;
+}
+
+.previewImage {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  border-radius: 14px;
+}
+
+.sectionGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.notice {
+  margin: 0;
+  color: #334155;
+  line-height: 1.9;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sidebarCard {
+  position: sticky;
+  top: 96px;
+  border-radius: 20px !important;
+}
+
+.consultBox {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.consultBox p {
+  margin: 0;
+  color: #475569;
+  line-height: 1.85;
+}
+
+.consultValue {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.relatedGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+@media (max-width: 1100px) {
+  .detailLayout,
+  .heroCard,
+  .sectionGrid,
+  .relatedGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebarCard {
+    position: static;
+  }
+}

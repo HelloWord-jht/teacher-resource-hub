@@ -1,0 +1,26 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background:
+    radial-gradient(circle at top left, rgba(37, 99, 235, 0.2), transparent 26%),
+    linear-gradient(180deg, #eff6ff 0%, #f8fbff 100%);
+}
+
+.card {
+  width: min(440px, 100%);
+  border-radius: 24px !important;
+  box-shadow: 0 28px 50px rgba(37, 99, 235, 0.12);
+}
+
+.title {
+  margin-bottom: 8px !important;
+}
+
+.desc {
+  color: #64748b;
+  line-height: 1.9;
+  margin-bottom: 24px !important;
+}
