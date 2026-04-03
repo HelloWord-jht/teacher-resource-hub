@@ -1,58 +1,73 @@
-.detailLayout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px;
-  gap: 24px;
-}
-
-.main {
+.page {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 22px;
 }
 
-.heroCard {
+.topGrid {
   display: grid;
-  grid-template-columns: minmax(320px, 0.92fr) minmax(0, 1.08fr);
+  grid-template-columns: minmax(0, 1.1fr) 360px;
   gap: 20px;
-  background: #fff;
+  align-items: stretch;
+}
+
+.summaryCard {
+  background: #ffffff;
   border-radius: 24px;
-  padding: 20px;
-  border: 1px solid rgba(148, 163, 184, 0.16);
+  padding: 24px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
   box-shadow: 0 18px 30px rgba(15, 23, 42, 0.06);
 }
 
-.coverWrap {
-  border-radius: 20px;
-  overflow: hidden;
-  background: #eff6ff;
-}
-
-.cover {
-  width: 100%;
-  height: 100%;
-  min-height: 360px;
-  object-fit: cover;
-  display: block;
-}
-
-.info h1 {
-  margin: 8px 0 12px;
-  font-size: clamp(28px, 4vw, 40px);
-  line-height: 1.2;
-  color: #0f172a;
-}
-
-.scene {
-  margin: 0;
+.eyebrow {
+  margin: 0 0 8px;
   color: #2563eb;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
 }
 
-.summary {
+.summaryCard h1 {
   margin: 0;
-  color: #334155;
+  color: #0f172a;
+  font-size: clamp(30px, 4vw, 42px);
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+.fitSummary {
+  margin: 14px 0 0;
+  color: #1d4ed8;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.7;
+}
+
+.summary {
+  margin: 14px 0 0;
+  color: #475569;
   line-height: 1.9;
+}
+
+.codePanel {
+  margin-top: 18px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: #f8fbff;
+  border: 1px solid #dbeafe;
+}
+
+.codeLabel {
+  display: block;
+  margin-bottom: 6px;
+  color: #64748b;
+  font-size: 12px;
+}
+
+.codeValue {
+  color: #0f172a;
+  font-size: 22px;
+  font-variant-numeric: tabular-nums;
+  word-break: break-word;
 }
 
 .tagGroup {
@@ -65,55 +80,129 @@
 .metaGrid {
   margin-top: 22px;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
 }
 
 .metaGrid div {
   background: #f8fafc;
-  border-radius: 14px;
+  border-radius: 16px;
   padding: 14px;
 }
 
 .metaGrid span {
   display: block;
-  font-size: 12px;
-  color: #64748b;
   margin-bottom: 6px;
+  color: #64748b;
+  font-size: 12px;
 }
 
 .metaGrid strong {
   color: #0f172a;
 }
 
-.heroActions {
-  margin-top: 22px;
+.detailLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 336px;
+  gap: 24px;
+}
+
+.main {
   display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
 }
 
-.sectionCard {
-  border-radius: 20px !important;
+.sectionCard,
+.bottomConsultCard,
+.sidebarCard {
+  border-radius: 22px !important;
 }
 
-.previewImage {
-  width: 100%;
-  aspect-ratio: 16 / 10;
-  object-fit: cover;
-  border-radius: 14px;
+.cardExtra {
+  color: #64748b;
+  font-size: 13px;
 }
 
-.sectionGrid {
+.sectionGrid,
+.noteGrid,
+.relatedGrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px;
 }
 
-.notice {
+.bulletList {
   margin: 0;
+  padding-left: 18px;
   color: #334155;
   line-height: 1.9;
+}
+
+.bulletList li + li {
+  margin-top: 10px;
+}
+
+.valueGrid,
+.contentGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.valueCard,
+.contentCard,
+.noteBox {
+  padding: 18px;
+  border-radius: 18px;
+  background: #f8fafc;
+  border: 1px solid rgba(191, 219, 254, 0.8);
+}
+
+.valueIndex,
+.contentIndex {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 14px;
+  background: #eff6ff;
+  color: #2563eb;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.valueCard p,
+.contentCard p,
+.noteBox p {
+  margin: 10px 0 0;
+  color: #475569;
+  line-height: 1.85;
+}
+
+.contentCard strong,
+.noteBox h3 {
+  color: #0f172a;
+}
+
+.noteBox h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.bottomConsultContent {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: flex-start;
+}
+
+.bottomText {
+  margin-bottom: 0 !important;
+  color: #475569;
+  line-height: 1.85;
 }
 
 .sidebar {
@@ -125,42 +214,70 @@
 .sidebarCard {
   position: sticky;
   top: 96px;
-  border-radius: 20px !important;
 }
 
-.consultBox {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.consultBox p {
-  margin: 0;
+.formTip {
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: #f8fafc;
   color: #475569;
-  line-height: 1.85;
+  line-height: 1.8;
 }
 
-.consultValue {
-  font-size: 18px;
-  font-weight: 700;
-  color: #0f172a;
+.primarySubmit {
+  width: 100%;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+  padding: 12px 16px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
 }
 
-.relatedGrid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 20px;
+.primarySubmit:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.primarySubmit:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.26);
+  outline-offset: 2px;
 }
 
 @media (max-width: 1100px) {
+  .topGrid,
   .detailLayout,
-  .heroCard,
   .sectionGrid,
-  .relatedGrid {
+  .noteGrid,
+  .relatedGrid,
+  .valueGrid,
+  .contentGrid {
     grid-template-columns: 1fr;
   }
 
   .sidebarCard {
     position: static;
+  }
+
+  .metaGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .summaryCard {
+    padding: 20px;
+  }
+
+  .metaGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .bottomConsultContent {
+    flex-direction: column;
+    align-items: stretch;
   }
 }

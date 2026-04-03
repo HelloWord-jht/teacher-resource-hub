@@ -38,8 +38,13 @@ services:
       SPRING_DATASOURCE_PASSWORD: root
       JWT_SECRET: teacher-resource-hub-please-change-this-secret-key-2026
       JWT_EXPIRE_SECONDS: 86400
+      SPRING_SERVLET_MULTIPART_MAX_FILE_SIZE: 50MB
+      SPRING_SERVLET_MULTIPART_MAX_REQUEST_SIZE: 100MB
+      APP_PREVIEW_STORAGE_ROOT: /data/preview-files
     ports:
       - "8080:8080"
+    volumes:
+      - preview-data:/data/preview-files
 
   frontend:
     build:
@@ -53,3 +58,4 @@ services:
 
 volumes:
   mysql-data:
+  preview-data:

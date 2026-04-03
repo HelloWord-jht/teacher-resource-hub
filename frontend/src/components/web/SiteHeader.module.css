@@ -61,7 +61,9 @@
   font-size: 15px;
   padding-bottom: 4px;
   border-bottom: 2px solid transparent;
-  transition: all 0.2s ease;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .navItem:hover,
@@ -72,6 +74,13 @@
 
 .action {
   flex-shrink: 0;
+}
+
+.navItem:focus-visible,
+.logo:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.22);
+  outline-offset: 2px;
+  border-radius: 10px;
 }
 
 @media (max-width: 900px) {

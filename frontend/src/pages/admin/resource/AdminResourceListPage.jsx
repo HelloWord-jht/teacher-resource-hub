@@ -4,15 +4,28 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { adminApi } from '../../../api/admin';
 import LoadingState from '../../../components/common/LoadingState';
+import { useFulfillmentStore } from '../../../store/fulfillmentStore';
+import {
+  authorizationStatusOptions,
+  renderAuthorizationStatusTag,
+  renderResourceStatusTag,
+  renderYesNoTag,
+  resourceStatusOptions,
+} from '../../../utils/admin.jsx';
 import { formatDateTime, formatPrice } from '../../../utils/format';
-import { renderResourceStatusTag, renderYesNoTag, resourceStatusOptions } from '../../../utils/admin.jsx';
 
 function AdminResourceListPage() {
   const navigate = useNavigate();
+  const openFulfillmentDrawer = useFulfillmentStore((state) => state.openDrawer);
   const [categories, setCategories] = useState([]);
   const [pageData, setPageData] = useState({ list: [], total: 0, pageNum: 1, pageSize: 10 });
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState({ keyword: '', categoryId: undefined, status: undefined });
+  const [filters, setFilters] = useState({
+    keyword: '',
+    categoryId: undefined,
+    status: undefined,
+    authorizationStatus: undefined,
+  });
   const [searchInput, setSearchInput] = useState('');
 
   const loadData = (pageNum = pageData.pageNum, pageSize = pageData.pageSize, nextFilters = filters) => {
@@ -47,8 +60,8 @@ function AdminResourceListPage() {
 
       <Space wrap style={{ marginBottom: 16 }}>
         <Input.Search
-          placeholder="输入资源标题或简介关键词"
-          style={{ width: 280 }}
+          placeholder="输入资源标题、资源码或搜索关键词"
+          style={{ width: 300 }}
           value={searchInput}
           onChange={(event) => setSearchInput(event.target.value)}
           onSearch={(value) => {
@@ -82,9 +95,26 @@ function AdminResourceListPage() {
             loadData(1, pageData.pageSize, nextFilters);
           }}
         />
+        <Select
+          allowClear
+          placeholder="按授权状态筛选"
+          style={{ width: 180 }}
+          options={authorizationStatusOptions}
+          value={filters.authorizationStatus}
+          onChange={(value) => {
+            const nextFilters = { ...filters, authorizationStatus: value };
+            setFilters(nextFilters);
+            loadData(1, pageData.pageSize, nextFilters);
+          }}
+        />
         <Button
           onClick={() => {
-            const nextFilters = { keyword: '', categoryId: undefined, status: undefined };
+            const nextFilters = {
+              keyword: '',
+              categoryId: undefined,
+              status: undefined,
+              authorizationStatus: undefined,
+            };
             setSearchInput('');
             setFilters(nextFilters);
             loadData(1, pageData.pageSize, nextFilters);
@@ -99,26 +129,44 @@ function AdminResourceListPage() {
         loading={loading}
         pagination={false}
         dataSource={pageData.list}
-        scroll={{ x: 1200 }}
+        scroll={{ x: 1660 }}
         columns={[
-          { title: '资源标题', dataIndex: 'title', width: 220, fixed: 'left' },
+          { title: '资源标题', dataIndex: 'title', width: 240, fixed: 'left' },
+          { title: '资源码', dataIndex: 'resourceCode', width: 200 },
           { title: '分类', dataIndex: 'categoryName', width: 140 },
           { title: '展示价格', dataIndex: 'displayPrice', width: 120, render: formatPrice },
           { title: '适用年级', dataIndex: 'grade', width: 140 },
           { title: '场景', dataIndex: 'scene', width: 120 },
+          {
+            title: '授权状态',
+            dataIndex: 'authorizationStatusSnapshot',
+            width: 120,
+            render: renderAuthorizationStatusTag,
+          },
           { title: '状态', dataIndex: 'status', width: 100, render: renderResourceStatusTag },
           { title: '推荐', dataIndex: 'isRecommended', width: 100, render: renderYesNoTag },
           { title: '浏览量', dataIndex: 'viewCount', width: 90 },
+          { title: '咨询量', dataIndex: 'consultCount', width: 90 },
+          { title: '预览图数', dataIndex: 'previewCount', width: 100 },
+          { title: '内容项数', dataIndex: 'contentItemCount', width: 100 },
           { title: '排序值', dataIndex: 'sortOrder', width: 90 },
-          { title: '发布时间', dataIndex: 'publishTime', width: 170, render: formatDateTime },
+          { title: '更新时间', dataIndex: 'updatedAt', width: 170, render: formatDateTime },
           {
             title: '操作',
-            width: 250,
+            width: 360,
             fixed: 'right',
             render: (_, record) => (
               <Space>
                 <Button size="small" onClick={() => navigate(`/admin/resources/${record.id}/edit`)}>
                   编辑
+                </Button>
+                <Button
+                  size="small"
+                  type="primary"
+                  ghost
+                  onClick={() => openFulfillmentDrawer({ resourceCode: record.resourceCode })}
+                >
+                  快速发货
                 </Button>
                 <Button
                   size="small"

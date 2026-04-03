@@ -58,17 +58,23 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void createCategory(CategorySaveRequest request) {
-        validateUnique(null, request.getName(), request.getSlug());
+        validateUnique(null, request.getName().trim(), normalizeCode(request.getCode()), request.getSlug().trim());
         Category category = new Category();
         BeanUtils.copyProperties(request, category);
+        category.setName(request.getName().trim());
+        category.setCode(normalizeCode(request.getCode()));
+        category.setSlug(request.getSlug().trim());
         categoryMapper.insert(category);
     }
 
     @Override
     public void updateCategory(Long id, CategorySaveRequest request) {
         Category category = getCategoryOrThrow(id);
-        validateUnique(id, request.getName(), request.getSlug());
+        validateUnique(id, request.getName().trim(), normalizeCode(request.getCode()), request.getSlug().trim());
         BeanUtils.copyProperties(request, category);
+        category.setName(request.getName().trim());
+        category.setCode(normalizeCode(request.getCode()));
+        category.setSlug(request.getSlug().trim());
         categoryMapper.updateById(category);
     }
 
@@ -96,12 +102,19 @@ public class CategoryServiceImpl implements CategoryService {
         return count == null ? 0L : count;
     }
 
-    private void validateUnique(Long id, String name, String slug) {
+    private void validateUnique(Long id, String name, String code, String slug) {
         Category byName = categoryMapper.selectOne(new LambdaQueryWrapper<Category>()
                 .eq(Category::getName, name)
                 .last("LIMIT 1"));
         if (byName != null && !byName.getId().equals(id)) {
             throw new BusinessException("分类名称已存在");
+        }
+
+        Category byCode = categoryMapper.selectOne(new LambdaQueryWrapper<Category>()
+                .eq(Category::getCode, code)
+                .last("LIMIT 1"));
+        if (byCode != null && !byCode.getId().equals(id)) {
+            throw new BusinessException("分类缩写已存在");
         }
 
         Category bySlug = categoryMapper.selectOne(new LambdaQueryWrapper<Category>()
@@ -118,6 +131,10 @@ public class CategoryServiceImpl implements CategoryService {
             throw new BusinessException("分类不存在");
         }
         return category;
+    }
+
+    private String normalizeCode(String code) {
+        return code == null ? "" : code.trim().toUpperCase();
     }
 
     private List<CategoryVO> toCategoryVOList(List<Category> list) {

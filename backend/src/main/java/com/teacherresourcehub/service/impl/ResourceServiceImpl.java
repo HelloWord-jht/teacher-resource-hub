@@ -4,7 +4,11 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.teacherresourcehub.common.api.PageResult;
+import com.teacherresourcehub.common.enums.AuthorizationStatus;
 import com.teacherresourcehub.common.enums.ResourceSortType;
+import com.teacherresourcehub.common.util.HtmlSanitizer;
+import com.teacherresourcehub.common.util.ResourceCodeGenerator;
+import com.teacherresourcehub.common.util.SearchKeywordTokenizer;
 import com.teacherresourcehub.dto.ResourceAdminQueryRequest;
 import com.teacherresourcehub.dto.ResourceQueryRequest;
 import com.teacherresourcehub.dto.ResourceSaveRequest;
@@ -12,6 +16,7 @@ import com.teacherresourcehub.entity.Category;
 import com.teacherresourcehub.entity.Resource;
 import com.teacherresourcehub.entity.ResourcePreview;
 import com.teacherresourcehub.entity.ResourceRecommend;
+import com.teacherresourcehub.entity.ResourceSource;
 import com.teacherresourcehub.entity.ResourceTag;
 import com.teacherresourcehub.entity.Tag;
 import com.teacherresourcehub.exception.BusinessException;
@@ -19,6 +24,7 @@ import com.teacherresourcehub.mapper.CategoryMapper;
 import com.teacherresourcehub.mapper.ResourceMapper;
 import com.teacherresourcehub.mapper.ResourcePreviewMapper;
 import com.teacherresourcehub.mapper.ResourceRecommendMapper;
+import com.teacherresourcehub.mapper.ResourceSourceMapper;
 import com.teacherresourcehub.mapper.ResourceTagMapper;
 import com.teacherresourcehub.mapper.TagMapper;
 import com.teacherresourcehub.service.FaqService;
@@ -37,6 +43,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -59,6 +66,7 @@ public class ResourceServiceImpl implements ResourceService {
     private final ResourcePreviewMapper resourcePreviewMapper;
     private final ResourceTagMapper resourceTagMapper;
     private final ResourceRecommendMapper resourceRecommendMapper;
+    private final ResourceSourceMapper resourceSourceMapper;
     private final CategoryMapper categoryMapper;
     private final TagMapper tagMapper;
     private final FaqService faqService;
@@ -68,6 +76,7 @@ public class ResourceServiceImpl implements ResourceService {
                                ResourcePreviewMapper resourcePreviewMapper,
                                ResourceTagMapper resourceTagMapper,
                                ResourceRecommendMapper resourceRecommendMapper,
+                               ResourceSourceMapper resourceSourceMapper,
                                CategoryMapper categoryMapper,
                                TagMapper tagMapper,
                                FaqService faqService,
@@ -76,6 +85,7 @@ public class ResourceServiceImpl implements ResourceService {
         this.resourcePreviewMapper = resourcePreviewMapper;
         this.resourceTagMapper = resourceTagMapper;
         this.resourceRecommendMapper = resourceRecommendMapper;
+        this.resourceSourceMapper = resourceSourceMapper;
         this.categoryMapper = categoryMapper;
         this.tagMapper = tagMapper;
         this.faqService = faqService;
@@ -86,7 +96,8 @@ public class ResourceServiceImpl implements ResourceService {
     public PageResult<ResourceListItemVO> pageWebResources(ResourceQueryRequest request) {
         Page<Resource> page = new Page<>(request.getPageNum(), request.getPageSize());
         LambdaQueryWrapper<Resource> wrapper = new LambdaQueryWrapper<Resource>()
-                .eq(Resource::getStatus, 1);
+                .eq(Resource::getStatus, 1)
+                .eq(Resource::getAuthorizationStatusSnapshot, AuthorizationStatus.APPROVED.name());
 
         if (request.getCategoryId() != null) {
             wrapper.eq(Resource::getCategoryId, request.getCategoryId());
@@ -98,9 +109,14 @@ public class ResourceServiceImpl implements ResourceService {
             wrapper.eq(Resource::getScene, request.getScene());
         }
         if (StringUtils.hasText(request.getKeyword())) {
-            wrapper.and(w -> w.like(Resource::getTitle, request.getKeyword())
+            String trimmedKeyword = request.getKeyword().trim();
+            wrapper.and(w -> w.eq(Resource::getResourceCode, trimmedKeyword)
                     .or()
-                    .like(Resource::getSummary, request.getKeyword()));
+                    .like(Resource::getTitle, trimmedKeyword)
+                    .or()
+                    .like(Resource::getSummary, trimmedKeyword)
+                    .or()
+                    .like(Resource::getSearchKeywords, trimmedKeyword));
         }
         if (request.getTagId() != null) {
             List<Long> resourceIds = resourceTagMapper.selectList(new LambdaQueryWrapper<ResourceTag>()
@@ -125,6 +141,7 @@ public class ResourceServiceImpl implements ResourceService {
         Resource resource = resourceMapper.selectOne(new LambdaQueryWrapper<Resource>()
                 .eq(Resource::getId, id)
                 .eq(Resource::getStatus, 1)
+                .eq(Resource::getAuthorizationStatusSnapshot, AuthorizationStatus.APPROVED.name())
                 .last("LIMIT 1"));
         if (resource == null) {
             throw new BusinessException("资源不存在或已下线");
@@ -146,13 +163,27 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     @Override
+    public ResourceDetailVO getWebResourceDetailByCode(String resourceCode) {
+        Resource resource = resourceMapper.selectOne(new LambdaQueryWrapper<Resource>()
+                .eq(Resource::getResourceCode, resourceCode)
+                .eq(Resource::getStatus, 1)
+                .eq(Resource::getAuthorizationStatusSnapshot, AuthorizationStatus.APPROVED.name())
+                .last("LIMIT 1"));
+        if (resource == null) {
+            throw new BusinessException("资源码不存在或资源未发布");
+        }
+        return getWebResourceDetail(resource.getId());
+    }
+
+    @Override
     public List<ResourceListItemVO> listPublishedResourceListItemsByIds(List<Long> ids) {
         if (ids == null || ids.isEmpty()) {
             return Collections.emptyList();
         }
         List<Resource> resources = resourceMapper.selectList(new LambdaQueryWrapper<Resource>()
                 .in(Resource::getId, ids)
-                .eq(Resource::getStatus, 1));
+                .eq(Resource::getStatus, 1)
+                .eq(Resource::getAuthorizationStatusSnapshot, AuthorizationStatus.APPROVED.name()));
         Map<Long, ResourceListItemVO> map = buildResourceListItems(resources).stream()
                 .collect(Collectors.toMap(ResourceListItemVO::getId, Function.identity(), (a, b) -> a));
         return ids.stream().map(map::get).filter(Objects::nonNull).toList();
@@ -165,7 +196,8 @@ public class ResourceServiceImpl implements ResourceService {
         }
         List<Resource> resources = resourceMapper.selectList(new LambdaQueryWrapper<Resource>()
                 .in(Resource::getId, ids)
-                .eq(Resource::getStatus, 1));
+                .eq(Resource::getStatus, 1)
+                .eq(Resource::getAuthorizationStatusSnapshot, AuthorizationStatus.APPROVED.name()));
         Map<Long, ResourceRelationVO> map = resources.stream()
                 .map(this::toResourceRelationVO)
                 .collect(Collectors.toMap(ResourceRelationVO::getId, Function.identity(), (a, b) -> a));
@@ -179,13 +211,20 @@ public class ResourceServiceImpl implements ResourceService {
         if (StringUtils.hasText(request.getKeyword())) {
             wrapper.and(w -> w.like(Resource::getTitle, request.getKeyword())
                     .or()
-                    .like(Resource::getSummary, request.getKeyword()));
+                    .like(Resource::getSummary, request.getKeyword())
+                    .or()
+                    .like(Resource::getResourceCode, request.getKeyword())
+                    .or()
+                    .like(Resource::getSearchKeywords, request.getKeyword()));
         }
         if (request.getCategoryId() != null) {
             wrapper.eq(Resource::getCategoryId, request.getCategoryId());
         }
         if (request.getStatus() != null) {
             wrapper.eq(Resource::getStatus, request.getStatus());
+        }
+        if (StringUtils.hasText(request.getAuthorizationStatus())) {
+            wrapper.eq(Resource::getAuthorizationStatusSnapshot, request.getAuthorizationStatus().trim());
         }
         wrapper.orderByDesc(Resource::getSortOrder, Resource::getCreatedAt, Resource::getId);
         Page<Resource> result = resourceMapper.selectPage(page, wrapper);
@@ -215,12 +254,24 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     @Override
+    public ResourceAdminDetailVO getAdminResourceDetailByCode(String resourceCode) {
+        Resource resource = resourceMapper.selectOne(new LambdaQueryWrapper<Resource>()
+                .eq(Resource::getResourceCode, resourceCode)
+                .last("LIMIT 1"));
+        if (resource == null) {
+            throw new BusinessException("资源码不存在");
+        }
+        return getAdminResourceDetail(resource.getId());
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public void createResource(ResourceSaveRequest request) {
         validateResourceRequest(null, request);
         Resource resource = new Resource();
         fillResourceEntity(resource, request, null);
         resource.setViewCount(0);
+        resource.setConsultCount(0);
         resourceMapper.insert(resource);
         saveRelations(resource.getId(), request);
     }
@@ -239,6 +290,9 @@ public class ResourceServiceImpl implements ResourceService {
     @Override
     public void updateResourceStatus(Long id, Integer status) {
         Resource resource = getResourceOrThrow(id);
+        if (status != null && status == 1 && !AuthorizationStatus.APPROVED.name().equals(resource.getAuthorizationStatusSnapshot())) {
+            throw new BusinessException("来源授权未通过，不能发布到前台");
+        }
         resource.setStatus(status);
         if (status != null && status == 1 && resource.getPublishTime() == null) {
             resource.setPublishTime(LocalDateTime.now());
@@ -261,8 +315,13 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     private void validateResourceRequest(Long id, ResourceSaveRequest request) {
-        if (categoryMapper.selectById(request.getCategoryId()) == null) {
+        Category category = categoryMapper.selectById(request.getCategoryId());
+        if (category == null) {
             throw new BusinessException("所选分类不存在");
+        }
+        ResourceSource source = resourceSourceMapper.selectById(request.getSourceId());
+        if (source == null) {
+            throw new BusinessException("所选来源不存在");
         }
 
         List<String> contentItems = sanitizeStringList(request.getContentItems());
@@ -280,6 +339,15 @@ public class ResourceServiceImpl implements ResourceService {
                 .last("LIMIT 1"));
         if (exists != null && !exists.getId().equals(id)) {
             throw new BusinessException("资源别名已存在");
+        }
+
+        if (StringUtils.hasText(request.getResourceCode())) {
+            Resource byResourceCode = resourceMapper.selectOne(new LambdaQueryWrapper<Resource>()
+                    .eq(Resource::getResourceCode, request.getResourceCode().trim())
+                    .last("LIMIT 1"));
+            if (byResourceCode != null && !byResourceCode.getId().equals(id)) {
+                throw new BusinessException("资源码已存在");
+            }
         }
 
         List<Long> tagIds = sanitizeLongList(request.getTagIdList(), null);
@@ -303,18 +371,32 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     private void fillResourceEntity(Resource target, ResourceSaveRequest request, Resource oldResource) {
+        Category category = categoryMapper.selectById(request.getCategoryId());
+        ResourceSource source = resourceSourceMapper.selectById(request.getSourceId());
         target.setTitle(request.getTitle());
-        target.setSlug(request.getSlug());
+        target.setResourceCode(resolveResourceCode(request, oldResource, category));
+        target.setSlug(request.getSlug().trim());
         target.setCategoryId(request.getCategoryId());
+        target.setSourceId(request.getSourceId());
         target.setSummary(request.getSummary());
         target.setCoverImage(request.getCoverImage());
         target.setDisplayPrice(request.getDisplayPrice());
         target.setGrade(request.getGrade());
         target.setScene(request.getScene());
         target.setContentItemsJson(toJson(sanitizeStringList(request.getContentItems())));
-        target.setDescriptionHtml(request.getDescriptionHtml());
+        target.setDescriptionHtml(HtmlSanitizer.sanitize(request.getDescriptionHtml()));
         target.setUsageNotice(request.getUsageNotice());
-        target.setStatus(request.getStatus());
+        target.setDeliveryNotice(request.getDeliveryNotice());
+        target.setSearchKeywords(SearchKeywordTokenizer.joinAsSearchKeywords(
+                request.getTitle(),
+                request.getSummary(),
+                request.getScene(),
+                String.join(" ", sanitizeStringList(request.getContentItems()))
+        ));
+        target.setAuthorizationStatusSnapshot(source.getAuthorizationStatus());
+        target.setPreviewCount(sanitizeStringList(request.getPreviewImageList()).size());
+        target.setContentItemCount(sanitizeStringList(request.getContentItems()).size());
+        target.setStatus(AuthorizationStatus.APPROVED.name().equals(source.getAuthorizationStatus()) ? request.getStatus() : 0);
         target.setIsRecommended(request.getIsRecommended());
         target.setSortOrder(request.getSortOrder());
 
@@ -322,7 +404,8 @@ public class ResourceServiceImpl implements ResourceService {
             target.setPublishTime(request.getPublishTime());
         } else if (oldResource != null && oldResource.getPublishTime() != null) {
             target.setPublishTime(oldResource.getPublishTime());
-        } else if (request.getStatus() != null && request.getStatus() == 1) {
+        } else if (request.getStatus() != null && request.getStatus() == 1
+                && AuthorizationStatus.APPROVED.name().equals(source.getAuthorizationStatus())) {
             target.setPublishTime(LocalDateTime.now());
         } else {
             target.setPublishTime(null);
@@ -493,6 +576,7 @@ public class ResourceServiceImpl implements ResourceService {
         ResourceRelationVO vo = new ResourceRelationVO();
         vo.setId(resource.getId());
         vo.setTitle(resource.getTitle());
+        vo.setResourceCode(resource.getResourceCode());
         vo.setCoverImage(resource.getCoverImage());
         vo.setDisplayPrice(resource.getDisplayPrice());
         vo.setGrade(resource.getGrade());
@@ -524,5 +608,34 @@ public class ResourceServiceImpl implements ResourceService {
             }
         }
         return new ArrayList<>(set);
+    }
+
+    private String resolveResourceCode(ResourceSaveRequest request, Resource oldResource, Category category) {
+        if (oldResource != null && StringUtils.hasText(oldResource.getResourceCode())) {
+            return oldResource.getResourceCode();
+        }
+        if (StringUtils.hasText(request.getResourceCode())) {
+            return request.getResourceCode().trim();
+        }
+        if (category == null || !StringUtils.hasText(category.getCode())) {
+            throw new BusinessException("分类缩写缺失，无法生成资源码");
+        }
+        LocalDate today = LocalDate.now();
+        String prefix = "RES-" + category.getCode() + "-" + today.format(java.time.format.DateTimeFormatter.BASIC_ISO_DATE) + "-";
+        List<Resource> sameDayResources = resourceMapper.selectList(new LambdaQueryWrapper<Resource>()
+                .likeRight(Resource::getResourceCode, prefix));
+        int maxSequence = 0;
+        for (Resource sameDayResource : sameDayResources) {
+            String resourceCode = sameDayResource.getResourceCode();
+            if (!StringUtils.hasText(resourceCode) || resourceCode.length() < 4) {
+                continue;
+            }
+            String suffix = resourceCode.substring(resourceCode.length() - 4);
+            try {
+                maxSequence = Math.max(maxSequence, Integer.parseInt(suffix));
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        return ResourceCodeGenerator.generate(category.getCode(), today, maxSequence + 1);
     }
 }

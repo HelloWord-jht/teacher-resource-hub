@@ -7,6 +7,7 @@ public class ResourceAdminQueryRequest extends PageRequest {
     private String keyword;
     private Long categoryId;
     private Integer status;
+    private String authorizationStatus;
 
     @java.lang.SuppressWarnings("all")
     @lombok.Generated
@@ -33,6 +34,12 @@ public class ResourceAdminQueryRequest extends PageRequest {
 
     @java.lang.SuppressWarnings("all")
     @lombok.Generated
+    public String getAuthorizationStatus() {
+        return this.authorizationStatus;
+    }
+
+    @java.lang.SuppressWarnings("all")
+    @lombok.Generated
     public void setKeyword(final String keyword) {
         this.keyword = keyword;
     }
@@ -49,11 +56,17 @@ public class ResourceAdminQueryRequest extends PageRequest {
         this.status = status;
     }
 
+    @java.lang.SuppressWarnings("all")
+    @lombok.Generated
+    public void setAuthorizationStatus(final String authorizationStatus) {
+        this.authorizationStatus = authorizationStatus;
+    }
+
     @java.lang.Override
     @java.lang.SuppressWarnings("all")
     @lombok.Generated
     public java.lang.String toString() {
-        return "ResourceAdminQueryRequest(keyword=" + this.getKeyword() + ", categoryId=" + this.getCategoryId() + ", status=" + this.getStatus() + ")";
+        return "ResourceAdminQueryRequest(keyword=" + this.getKeyword() + ", categoryId=" + this.getCategoryId() + ", status=" + this.getStatus() + ", authorizationStatus=" + this.getAuthorizationStatus() + ")";
     }
 
     @java.lang.Override
@@ -71,6 +84,9 @@ public class ResourceAdminQueryRequest extends PageRequest {
         final java.lang.Object this$status = this.getStatus();
         final java.lang.Object other$status = other.getStatus();
         if (this$status == null ? other$status != null : !this$status.equals(other$status)) return false;
+        final java.lang.Object this$authorizationStatus = this.getAuthorizationStatus();
+        final java.lang.Object other$authorizationStatus = other.getAuthorizationStatus();
+        if (this$authorizationStatus == null ? other$authorizationStatus != null : !this$authorizationStatus.equals(other$authorizationStatus)) return false;
         final java.lang.Object this$keyword = this.getKeyword();
         final java.lang.Object other$keyword = other.getKeyword();
         if (this$keyword == null ? other$keyword != null : !this$keyword.equals(other$keyword)) return false;
@@ -93,6 +109,8 @@ public class ResourceAdminQueryRequest extends PageRequest {
         result = result * PRIME + ($categoryId == null ? 43 : $categoryId.hashCode());
         final java.lang.Object $status = this.getStatus();
         result = result * PRIME + ($status == null ? 43 : $status.hashCode());
+        final java.lang.Object $authorizationStatus = this.getAuthorizationStatus();
+        result = result * PRIME + ($authorizationStatus == null ? 43 : $authorizationStatus.hashCode());
         final java.lang.Object $keyword = this.getKeyword();
         result = result * PRIME + ($keyword == null ? 43 : $keyword.hashCode());
         return result;

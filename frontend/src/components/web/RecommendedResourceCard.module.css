@@ -1,0 +1,96 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 20px;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.05);
+}
+
+.coverWrap {
+  display: block;
+}
+
+.cover {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: #2563eb;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.title {
+  color: #0f172a;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.summary {
+  margin: 0;
+  color: #475569;
+  line-height: 1.8;
+}
+
+.codeBox {
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: #f8fbff;
+  border: 1px solid #dbeafe;
+}
+
+.codeBox span {
+  display: block;
+  margin-bottom: 4px;
+  color: #64748b;
+  font-size: 12px;
+}
+
+.codeBox strong {
+  color: #0f172a;
+  font-variant-numeric: tabular-nums;
+  word-break: break-word;
+}
+
+.bottom {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: flex-end;
+  margin-top: auto;
+}
+
+.price {
+  color: #0f172a;
+  font-size: 22px;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+@media (max-width: 768px) {
+  .bottom {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

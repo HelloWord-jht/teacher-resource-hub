@@ -4,6 +4,7 @@ package com.teacherresourcehub.vo;
 public class CategoryVO {
     private Long id;
     private String name;
+    private String code;
     private String slug;
     private String description;
     private String icon;
@@ -25,6 +26,12 @@ public class CategoryVO {
     @lombok.Generated
     public String getName() {
         return this.name;
+    }
+
+    @java.lang.SuppressWarnings("all")
+    @lombok.Generated
+    public String getCode() {
+        return this.code;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -67,6 +74,12 @@ public class CategoryVO {
     @lombok.Generated
     public void setName(final String name) {
         this.name = name;
+    }
+
+    @java.lang.SuppressWarnings("all")
+    @lombok.Generated
+    public void setCode(final String code) {
+        this.code = code;
     }
 
     @java.lang.SuppressWarnings("all")
@@ -119,6 +132,9 @@ public class CategoryVO {
         final java.lang.Object this$name = this.getName();
         final java.lang.Object other$name = other.getName();
         if (this$name == null ? other$name != null : !this$name.equals(other$name)) return false;
+        final java.lang.Object this$code = this.getCode();
+        final java.lang.Object other$code = other.getCode();
+        if (this$code == null ? other$code != null : !this$code.equals(other$code)) return false;
         final java.lang.Object this$slug = this.getSlug();
         final java.lang.Object other$slug = other.getSlug();
         if (this$slug == null ? other$slug != null : !this$slug.equals(other$slug)) return false;
@@ -151,6 +167,8 @@ public class CategoryVO {
         result = result * PRIME + ($status == null ? 43 : $status.hashCode());
         final java.lang.Object $name = this.getName();
         result = result * PRIME + ($name == null ? 43 : $name.hashCode());
+        final java.lang.Object $code = this.getCode();
+        result = result * PRIME + ($code == null ? 43 : $code.hashCode());
         final java.lang.Object $slug = this.getSlug();
         result = result * PRIME + ($slug == null ? 43 : $slug.hashCode());
         final java.lang.Object $description = this.getDescription();
@@ -164,6 +182,6 @@ public class CategoryVO {
     @java.lang.SuppressWarnings("all")
     @lombok.Generated
     public java.lang.String toString() {
-        return "CategoryVO(id=" + this.getId() + ", name=" + this.getName() + ", slug=" + this.getSlug() + ", description=" + this.getDescription() + ", icon=" + this.getIcon() + ", sortOrder=" + this.getSortOrder() + ", status=" + this.getStatus() + ")";
+        return "CategoryVO(id=" + this.getId() + ", name=" + this.getName() + ", code=" + this.getCode() + ", slug=" + this.getSlug() + ", description=" + this.getDescription() + ", icon=" + this.getIcon() + ", sortOrder=" + this.getSortOrder() + ", status=" + this.getStatus() + ")";
     }
 }

@@ -71,6 +71,9 @@ public class SiteConfigServiceImpl implements SiteConfigService {
         vo.setHomeHotCategoryIds(parseLongList(configMap.get("home_hot_category_ids")));
         vo.setHomeRecommendedResourceIds(parseLongList(configMap.get("home_recommended_resource_ids")));
         vo.setHomeFaqIds(parseLongList(configMap.get("home_faq_ids")));
+        vo.setQuickConsultBarText(configMap.getOrDefault("quick_consult_bar_text", ""));
+        vo.setConsultNotice(configMap.getOrDefault("consult_notice", ""));
+        vo.setDeliveryProcess(parseStringList(configMap.get("delivery_process_json")));
         return vo;
     }
 
@@ -85,6 +88,9 @@ public class SiteConfigServiceImpl implements SiteConfigService {
         configMap.put("home_hot_category_ids", JsonUtils.toJson(request.getHomeHotCategoryIds()));
         configMap.put("home_recommended_resource_ids", JsonUtils.toJson(request.getHomeRecommendedResourceIds()));
         configMap.put("home_faq_ids", JsonUtils.toJson(request.getHomeFaqIds()));
+        configMap.put("quick_consult_bar_text", valueOrEmpty(request.getQuickConsultBarText()));
+        configMap.put("consult_notice", valueOrEmpty(request.getConsultNotice()));
+        configMap.put("delivery_process_json", JsonUtils.toJson(request.getDeliveryProcess()));
         saveGroupConfigs(ConfigGroupConstants.HOME, configMap);
     }
 
@@ -139,6 +145,14 @@ public class SiteConfigServiceImpl implements SiteConfigService {
             return Collections.emptyList();
         }
         return JsonUtils.parse(json, new TypeReference<List<Long>>() {
+        });
+    }
+
+    private List<String> parseStringList(String json) {
+        if (json == null || json.isBlank()) {
+            return Collections.emptyList();
+        }
+        return JsonUtils.parse(json, new TypeReference<List<String>>() {
         });
     }
 }

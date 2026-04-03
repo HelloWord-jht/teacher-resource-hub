@@ -1,0 +1,128 @@
+.panel {
+  min-height: 420px;
+  padding: 18px;
+  border: 1px solid #dbeafe;
+  border-radius: 18px;
+  background: #fff;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.header strong {
+  display: block;
+  margin-bottom: 8px;
+  color: #0f172a;
+}
+
+.metaLine {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pageHeader {
+  margin-bottom: 10px;
+}
+
+.pageSummary {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.pageTabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.pageTab {
+  min-width: 92px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  cursor: pointer;
+}
+
+.pageTab:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.24);
+  outline-offset: 2px;
+}
+
+.pageTabActive {
+  border-color: #2563eb;
+  background: #dbeafe;
+}
+
+.imageStage {
+  min-height: 320px;
+  padding: 18px;
+  border: 1px dashed #bfdbfe;
+  border-radius: 20px;
+  background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
+}
+
+.imageStage img {
+  width: 100%;
+  max-height: 520px;
+  object-fit: contain;
+  border-radius: 16px;
+}
+
+.textPreview {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  gap: 16px;
+  border: 1px solid #dbeafe;
+  background: #f8fbff;
+  border-radius: 18px;
+  padding: 18px;
+}
+
+.iconWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-size: 22px;
+}
+
+.textPreview pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: #334155;
+  font-family: inherit;
+  line-height: 1.8;
+}
+
+.emptyPreview {
+  min-height: 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+  }
+}

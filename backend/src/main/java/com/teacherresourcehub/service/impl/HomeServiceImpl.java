@@ -41,6 +41,9 @@ public class HomeServiceImpl implements HomeService {
         vo.setFooterText(siteConfig.getFooterText());
         vo.setHomeMainTitle(homeConfig.getHomeMainTitle());
         vo.setHomeSubTitle(homeConfig.getHomeSubTitle());
+        vo.setQuickConsultBarText(homeConfig.getQuickConsultBarText());
+        vo.setConsultNotice(homeConfig.getConsultNotice());
+        vo.setDeliveryProcess(homeConfig.getDeliveryProcess());
         vo.setHotCategories(categoryService.listByIds(homeConfig.getHomeHotCategoryIds()));
         vo.setRecommendedResources(resourceService.listPublishedResourceListItemsByIds(homeConfig.getHomeRecommendedResourceIds()));
         vo.setFaqList(homeConfig.getHomeFaqIds() == null || homeConfig.getHomeFaqIds().isEmpty()

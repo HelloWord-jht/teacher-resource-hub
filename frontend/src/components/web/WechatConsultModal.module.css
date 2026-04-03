@@ -1,0 +1,102 @@
+.modal :global(.ant-modal-content) {
+  border-radius: 24px;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 0.92fr);
+  gap: 20px;
+}
+
+.introBlock,
+.formBlock {
+  display: flex;
+  flex-direction: column;
+}
+
+.tipText {
+  margin: 0 0 14px;
+  color: #334155;
+  line-height: 1.8;
+}
+
+.contextCard {
+  margin-bottom: 16px;
+  padding: 14px;
+  border-radius: 18px;
+  background: #f8fafc;
+  border: 1px solid #dbeafe;
+}
+
+.contextTitle {
+  display: block;
+  color: #0f172a;
+}
+
+.contextCode {
+  margin-top: 8px;
+  display: inline-block;
+}
+
+.contextDesc {
+  margin: 10px 0 0;
+  color: #475569;
+  line-height: 1.75;
+}
+
+.qrPanel {
+  display: inline-flex;
+  justify-content: center;
+  padding: 16px;
+  background: #f8fafc;
+  border-radius: 18px;
+  margin-bottom: 16px;
+}
+
+.qrImage {
+  width: 220px;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.contactBlock {
+  margin-bottom: 16px;
+}
+
+.contactTitle {
+  margin-bottom: 8px !important;
+}
+
+.contactDesc,
+.formDesc {
+  margin: 0;
+  color: #64748b;
+  line-height: 1.8;
+}
+
+.statusHint {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  line-height: 1.75;
+  font-size: 13px;
+}
+
+.formBlock h3 {
+  margin: 0 0 8px;
+  color: #0f172a;
+}
+
+.formBlock :global(.ant-form-item-label > label) {
+  color: #0f172a;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}

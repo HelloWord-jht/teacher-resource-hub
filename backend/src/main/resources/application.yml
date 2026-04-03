@@ -15,8 +15,8 @@ spring:
     default-property-inclusion: non_null
   servlet:
     multipart:
-      max-file-size: 10MB
-      max-request-size: 20MB
+      max-file-size: ${SPRING_SERVLET_MULTIPART_MAX_FILE_SIZE:50MB}
+      max-request-size: ${SPRING_SERVLET_MULTIPART_MAX_REQUEST_SIZE:100MB}
 
 mybatis-plus:
   mapper-locations: classpath:/mapper/**/*.xml
@@ -50,11 +50,16 @@ app:
     allowed-origins:
       - http://localhost:5173
       - http://127.0.0.1:5173
+      - http://localhost:4173
+      - http://127.0.0.1:4173
       - http://localhost:8080
       - http://127.0.0.1:8080
   upload:
     preview-base-url: https://placehold.co
     note: 当前版本图片仅使用URL字段占位，后续可对接对象存储
+  preview:
+    storage-root: ${APP_PREVIEW_STORAGE_ROOT:${user.home}/.teacher-resource-hub/preview-data}
+    public-base-url: /preview-files
 
 logging:
   level:

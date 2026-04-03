@@ -1,0 +1,39 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.alignRight {
+  align-items: flex-end;
+}
+
+.compact {
+  gap: 8px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.hint {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  line-height: 1.75;
+  font-size: 13px;
+}
+
+@media (max-width: 768px) {
+  .alignRight {
+    align-items: stretch;
+  }
+
+  .actions {
+    width: 100%;
+  }
+}

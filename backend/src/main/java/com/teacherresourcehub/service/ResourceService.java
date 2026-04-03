@@ -18,6 +18,8 @@ public interface ResourceService {
 
     ResourceDetailVO getWebResourceDetail(Long id);
 
+    ResourceDetailVO getWebResourceDetailByCode(String resourceCode);
+
     List<ResourceListItemVO> listPublishedResourceListItemsByIds(List<Long> ids);
 
     List<ResourceRelationVO> listPublishedResourceRelationsByIds(List<Long> ids);
@@ -25,6 +27,8 @@ public interface ResourceService {
     PageResult<AdminResourceListItemVO> pageAdminResources(ResourceAdminQueryRequest request);
 
     ResourceAdminDetailVO getAdminResourceDetail(Long id);
+
+    ResourceAdminDetailVO getAdminResourceDetailByCode(String resourceCode);
 
     void createResource(ResourceSaveRequest request);
 

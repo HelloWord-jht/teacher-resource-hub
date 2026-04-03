@@ -1,41 +1,25 @@
-import { Button, Input, Pagination, Select, Space } from 'antd';
-import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Button, Pagination, Tag, message } from 'antd';
+import { useEffect, useRef, useState } from 'react';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import { webApi } from '../../api/web';
-import LoadingState from '../../components/common/LoadingState';
 import EmptyState from '../../components/common/EmptyState';
 import ErrorState from '../../components/common/ErrorState';
+import LoadingState from '../../components/common/LoadingState';
 import PageBanner from '../../components/web/PageBanner';
 import ResourceCard from '../../components/web/ResourceCard';
+import StickyFilterBar from '../../components/web/StickyFilterBar';
 import { useSiteStore } from '../../store/siteStore';
 import { useWechatStore } from '../../store/wechatStore';
+import {
+  buildWechatModalPayload,
+  reportVisitTraceOnce,
+} from '../../utils/attribution';
+import { copyText } from '../../utils/clipboard';
 import { setDocumentMeta } from '../../utils/format';
 import styles from './ResourceListPage.module.css';
 
-const gradeOptions = [
-  { label: '一年级-六年级', value: '一年级-六年级' },
-  { label: '三年级-六年级', value: '三年级-六年级' },
-];
-
-const sceneOptions = [
-  '开学第一课',
-  '家长会',
-  '主题班会',
-  '安全教育',
-  '期中复习',
-  '期末复习',
-  '公开课',
-  '家校沟通',
-  '节日活动',
-].map((item) => ({ label: item, value: item }));
-
-const sortOptions = [
-  { label: '最新发布', value: 'latest' },
-  { label: '热门优先', value: 'hot' },
-  { label: '推荐优先', value: 'recommended' },
-];
-
 function ResourceListPage() {
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const [categories, setCategories] = useState([]);
   const [tags, setTags] = useState([]);
@@ -43,6 +27,9 @@ function ResourceListPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [keywordInput, setKeywordInput] = useState(searchParams.get('keyword') || '');
+  const [highlightedResourceId, setHighlightedResourceId] = useState(null);
+  const [targetFound, setTargetFound] = useState(false);
+  const resourceRefs = useRef(new Map());
   const { homeData, fetchHomeData } = useSiteStore();
   const { openModal } = useWechatStore();
 
@@ -57,6 +44,9 @@ function ResourceListPage() {
     pageSize: Number(searchParams.get('pageSize') || 10),
   };
 
+  const resourceCodeFromQuery = searchParams.get('resourceCode') || '';
+  const targetResource = pageData.list.find((item) => item.resourceCode === resourceCodeFromQuery);
+
   useEffect(() => {
     setDocumentMeta({
       title: '资源中心｜小学课件教案资源导流站',
@@ -69,6 +59,15 @@ function ResourceListPage() {
     webApi.getCategories().then(setCategories).catch(() => {});
     webApi.getTags().then(setTags).catch(() => {});
   }, [fetchHomeData]);
+
+  useEffect(() => {
+    reportVisitTraceOnce({
+      pathname: location.pathname,
+      search: location.search,
+      searchParams,
+      targetResourceCode: resourceCodeFromQuery,
+    });
+  }, [location.pathname, location.search, resourceCodeFromQuery, searchParams]);
 
   useEffect(() => {
     setKeywordInput(searchParams.get('keyword') || '');
@@ -87,6 +86,27 @@ function ResourceListPage() {
       });
   }, [searchParams]);
 
+  useEffect(() => {
+    if (!resourceCodeFromQuery) {
+      setHighlightedResourceId(null);
+      setTargetFound(false);
+      return;
+    }
+    if (!targetResource) {
+      setHighlightedResourceId(null);
+      setTargetFound(false);
+      return;
+    }
+    setHighlightedResourceId(targetResource.id);
+    setTargetFound(true);
+    const targetNode = resourceRefs.current.get(targetResource.id);
+    if (targetNode) {
+      window.setTimeout(() => {
+        targetNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 120);
+    }
+  }, [resourceCodeFromQuery, targetResource]);
+
   const updateParams = (patch, resetPage = true) => {
     const next = new URLSearchParams(searchParams);
     Object.entries(patch).forEach(([key, value]) => {
@@ -102,13 +122,49 @@ function ResourceListPage() {
     setSearchParams(next);
   };
 
+  const handleReset = () => {
+    setKeywordInput('');
+    setSearchParams(
+      new URLSearchParams(
+        resourceCodeFromQuery
+          ? { sortType: 'latest', pageNum: '1', pageSize: '10', resourceCode: resourceCodeFromQuery }
+          : { sortType: 'latest', pageNum: '1', pageSize: '10' },
+      ),
+    );
+  };
+
+  const handleCopyResourceCode = async (resourceCode) => {
+    if (!resourceCode) {
+      message.warning('当前没有可复制的资源码');
+      return;
+    }
+    await copyText(resourceCode);
+    message.success('资源码已复制');
+  };
+
   return (
     <>
       <PageBanner
         title="资源中心"
         description="按分类、标签、年级和使用场景快速筛选，帮助老师更快找到能直接上课的完整资料包。"
         extra={
-          <Button type="primary" size="large" onClick={() => openModal(homeData?.wechatConsult)}>
+          <Button
+            type="primary"
+            size="large"
+            onClick={() =>
+              openModal(
+                buildWechatModalPayload({
+                  consultInfo: homeData?.wechatConsult,
+                  searchParams,
+                  pathname: location.pathname,
+                  search: location.search,
+                  resourceCode: resourceCodeFromQuery,
+                  resourceTitle: targetResource?.title || '',
+                  resourceId: targetResource?.id || null,
+                }),
+              )
+            }
+          >
             加微信咨询
           </Button>
         }
@@ -116,83 +172,110 @@ function ResourceListPage() {
 
       <section className="section-block">
         <div className="page-container">
-          <div className={styles.filterPanel}>
-            <div className={styles.filterGrid}>
-              <Select
-                allowClear
-                placeholder="选择分类"
-                value={params.categoryId}
-                options={categories.map((item) => ({ label: item.name, value: String(item.id) }))}
-                onChange={(value) => updateParams({ categoryId: value })}
-              />
-              <Select
-                allowClear
-                placeholder="选择标签"
-                value={params.tagId}
-                options={tags.map((item) => ({ label: item.name, value: String(item.id) }))}
-                onChange={(value) => updateParams({ tagId: value })}
-              />
-              <Select
-                allowClear
-                placeholder="选择年级"
-                value={params.grade}
-                options={gradeOptions}
-                onChange={(value) => updateParams({ grade: value })}
-              />
-              <Select
-                allowClear
-                placeholder="选择场景"
-                value={params.scene}
-                options={sceneOptions}
-                onChange={(value) => updateParams({ scene: value })}
-              />
-              <Input.Search
-                placeholder="输入资源标题或简介关键词"
-                value={keywordInput}
-                onChange={(event) => setKeywordInput(event.target.value)}
-                onSearch={() => updateParams({ keyword: keywordInput })}
-                allowClear
-              />
-            </div>
-
-            <Space wrap>
-              {sortOptions.map((item) => (
-                <Button
-                  key={item.value}
-                  type={params.sortType === item.value ? 'primary' : 'default'}
-                  onClick={() => updateParams({ sortType: item.value })}
-                >
-                  {item.label}
-                </Button>
-              ))}
-              <Button
-                onClick={() => {
-                  setKeywordInput('');
-                  setSearchParams(new URLSearchParams({ sortType: 'latest', pageNum: '1', pageSize: '10' }));
-                }}
-              >
-                重置筛选
-              </Button>
-            </Space>
+          <div className={styles.tipBar}>
+            <strong>快速咨询提示</strong>
+            <span>
+              {homeData?.quickConsultBarText ||
+                '看中资源后先复制资源码，加微信时直接发送给我们，可更快匹配和交付。'}
+            </span>
           </div>
 
-          {loading ? <LoadingState text="正在加载资源列表..." /> : null}
+          <StickyFilterBar
+            categories={categories}
+            tags={tags}
+            params={params}
+            keywordInput={keywordInput}
+            setKeywordInput={setKeywordInput}
+            updateParams={updateParams}
+            onReset={handleReset}
+          />
+
+          {resourceCodeFromQuery ? (
+            <div className={`${styles.locatedBar} ${targetFound ? styles.locatedBarActive : styles.locatedBarWarning}`}>
+              <div>
+                <strong>{targetFound ? '已为你定位目标资源' : '当前页暂未命中目标资源'}</strong>
+                <p>
+                  {targetFound
+                    ? `资源码 ${resourceCodeFromQuery} 已高亮显示，建议先复制资源码，再加微信咨询。`
+                    : `当前筛选结果中没有找到资源码 ${resourceCodeFromQuery}，可尝试清空筛选后重新查看。`}
+                </p>
+              </div>
+              {targetFound ? (
+                <div className={styles.locatedActions}>
+                  <Button onClick={() => handleCopyResourceCode(resourceCodeFromQuery)}>复制这个资源码</Button>
+                  <Button
+                    type="primary"
+                    onClick={() =>
+                      openModal(
+                        buildWechatModalPayload({
+                          consultInfo: homeData?.wechatConsult,
+                          searchParams,
+                          pathname: location.pathname,
+                          search: location.search,
+                          resourceCode: resourceCodeFromQuery,
+                          resourceTitle: targetResource?.title || '',
+                          resourceId: targetResource?.id || null,
+                        }),
+                      )
+                    }
+                  >
+                    直接加微信咨询
+                  </Button>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+
+          {loading ? <LoadingState text="正在加载资源列表…" /> : null}
           {!loading && error ? <ErrorState subTitle={error} onRetry={() => updateParams({})} /> : null}
           {!loading && !error && pageData.list?.length === 0 ? <EmptyState description="没有找到符合条件的资源" /> : null}
 
           {!loading && !error && pageData.list?.length > 0 ? (
             <>
               <div className={styles.resultBar}>
-                共找到 <strong>{pageData.total}</strong> 条资源
+                <div>
+                  共找到 <strong>{pageData.total}</strong> 条资源
+                </div>
+                {resourceCodeFromQuery ? (
+                  <Tag color="blue">当前落地资源码：{resourceCodeFromQuery}</Tag>
+                ) : null}
               </div>
               <div className={styles.listGrid}>
-                {pageData.list.map((resource) => (
-                  <ResourceCard
-                    key={resource.id}
-                    resource={resource}
-                    onWechatClick={() => openModal(homeData?.wechatConsult)}
-                  />
-                ))}
+                {pageData.list.map((resource) => {
+                  const isTarget = resource.id === highlightedResourceId;
+                  return (
+                    <div
+                      key={resource.id}
+                      ref={(node) => {
+                        if (node) {
+                          resourceRefs.current.set(resource.id, node);
+                        } else {
+                          resourceRefs.current.delete(resource.id);
+                        }
+                      }}
+                      className={isTarget ? styles.targetWrap : ''}
+                    >
+                      <ResourceCard
+                        resource={resource}
+                        highlighted={isTarget}
+                        highlightText="看中这份资料后，先复制这个资源码，再加微信咨询，会更快完成匹配与交付。"
+                        onWechatClick={() =>
+                          openModal(
+                            buildWechatModalPayload({
+                              consultInfo: homeData?.wechatConsult,
+                              searchParams,
+                              pathname: location.pathname,
+                              search: location.search,
+                              resourceId: resource.id,
+                              resourceCode: resource.resourceCode,
+                              resourceTitle: resource.title,
+                            }),
+                          )
+                        }
+                      />
+                    </div>
+                  );
+                })}
               </div>
               <div className={styles.paginationWrap}>
                 <Pagination

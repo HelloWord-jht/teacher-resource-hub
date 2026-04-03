@@ -1,29 +1,72 @@
-.filterPanel {
-  background: #fff;
-  border-radius: 20px;
-  border: 1px solid rgba(148, 163, 184, 0.16);
-  padding: 20px;
-  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.05);
+.tipBar {
   display: flex;
-  flex-direction: column;
-  gap: 18px;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 18px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1e3a8a;
 }
 
-.filterGrid {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 14px;
+.tipBar strong {
+  white-space: nowrap;
+}
+
+.locatedBar {
+  margin-top: 18px;
+  padding: 18px;
+  border-radius: 20px;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.locatedBarActive {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(191, 219, 254, 0.34));
+  border: 1px solid rgba(37, 99, 235, 0.22);
+}
+
+.locatedBarWarning {
+  background: #fff7ed;
+  border: 1px solid #fdba74;
+}
+
+.locatedBar strong {
+  color: #0f172a;
+}
+
+.locatedBar p {
+  margin: 8px 0 0;
+  color: #475569;
+  line-height: 1.75;
+}
+
+.locatedActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .resultBar {
   margin: 28px 0 18px;
   color: #475569;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
 }
 
 .listGrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px;
+}
+
+.targetWrap {
+  scroll-margin-top: 130px;
 }
 
 .paginationWrap {
@@ -33,8 +76,12 @@
 }
 
 @media (max-width: 1024px) {
-  .filterGrid,
   .listGrid {
     grid-template-columns: 1fr;
+  }
+
+  .tipBar,
+  .locatedBar {
+    flex-direction: column;
   }
 }

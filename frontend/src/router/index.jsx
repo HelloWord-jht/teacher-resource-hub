@@ -20,6 +20,12 @@ const AdminHomeConfigPage = lazy(() => import('../pages/admin/home-config/AdminH
 const AdminPageContentPage = lazy(() => import('../pages/admin/page-content/AdminPageContentPage'));
 const AdminResourceListPage = lazy(() => import('../pages/admin/resource/AdminResourceListPage'));
 const AdminResourceFormPage = lazy(() => import('../pages/admin/resource/AdminResourceFormPage'));
+const AdminFulfillmentCenterPage = lazy(() => import('../pages/admin/fulfillment/AdminFulfillmentCenterPage'));
+const AdminLeadChannelPage = lazy(() => import('../pages/admin/channel/AdminLeadChannelPage'));
+const AdminContentCampaignPage = lazy(() => import('../pages/admin/campaign/AdminContentCampaignPage'));
+const AdminResourceSourcePage = lazy(() => import('../pages/admin/resource-source/AdminResourceSourcePage'));
+const AdminResourceStoragePage = lazy(() => import('../pages/admin/resource-storage/AdminResourceStoragePage'));
+const AdminImportTaskPage = lazy(() => import('../pages/admin/import-task/AdminImportTaskPage'));
 
 function AdminRoute({ children }) {
   const token = useAdminAuthStore((state) => state.token);
@@ -31,7 +37,7 @@ function AdminRoute({ children }) {
 
 function AppRouter() {
   return (
-    <Suspense fallback={<LoadingState text="页面加载中，请稍候..." />}>
+    <Suspense fallback={<LoadingState text="页面加载中，请稍候…" />}>
       <Routes>
         <Route element={<WebLayout />}>
           <Route path="/" element={<HomePage />} />
@@ -54,9 +60,15 @@ function AppRouter() {
         >
           <Route index element={<Navigate to="/admin/dashboard" replace />} />
           <Route path="dashboard" element={<AdminDashboardPage />} />
+          <Route path="fulfillment" element={<AdminFulfillmentCenterPage />} />
           <Route path="resources" element={<AdminResourceListPage />} />
           <Route path="resources/create" element={<AdminResourceFormPage mode="create" />} />
           <Route path="resources/:id/edit" element={<AdminResourceFormPage mode="edit" />} />
+          <Route path="resource-sources" element={<AdminResourceSourcePage />} />
+          <Route path="resource-storages" element={<AdminResourceStoragePage />} />
+          <Route path="import-tasks" element={<AdminImportTaskPage />} />
+          <Route path="channels" element={<AdminLeadChannelPage />} />
+          <Route path="campaigns" element={<AdminContentCampaignPage />} />
           <Route path="categories" element={<AdminCategoryPage />} />
           <Route path="tags" element={<AdminTagPage />} />
           <Route path="faqs" element={<AdminFaqPage />} />

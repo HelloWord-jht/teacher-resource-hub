@@ -16,8 +16,20 @@ export const webApi = {
   getResourceDetail(id) {
     return request.get(`/api/web/resources/${id}`);
   },
+  getResourcePreviewFiles(resourceId) {
+    return request.get(`/api/web/resources/${resourceId}/preview-files`);
+  },
+  getResourcePreviewPages(resourceId, fileId) {
+    return request.get(`/api/web/resources/${resourceId}/preview-files/${fileId}/previews`);
+  },
+  getResourceByCode(resourceCode) {
+    return request.get(`/api/web/resource-by-code/${resourceCode}`);
+  },
   createLead(data) {
     return request.post('/api/web/leads', data);
+  },
+  createVisitTrace(data) {
+    return request.post('/api/web/visit-trace', data);
   },
   getPage(pageCode) {
     return request.get(`/api/web/pages/${pageCode}`);

@@ -5,8 +5,10 @@ import com.teacherresourcehub.common.api.Result;
 import com.teacherresourcehub.dto.ResourceAdminQueryRequest;
 import com.teacherresourcehub.dto.ResourceSaveRequest;
 import com.teacherresourcehub.dto.StatusUpdateRequest;
+import com.teacherresourcehub.service.FulfillmentService;
 import com.teacherresourcehub.service.ResourceService;
 import com.teacherresourcehub.vo.AdminResourceListItemVO;
+import com.teacherresourcehub.vo.FulfillmentQuickSearchItemVO;
 import com.teacherresourcehub.vo.ResourceAdminDetailVO;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,9 +25,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminResourceController {
 
     private final ResourceService resourceService;
+    private final FulfillmentService fulfillmentService;
 
-    public AdminResourceController(ResourceService resourceService) {
+    public AdminResourceController(ResourceService resourceService, FulfillmentService fulfillmentService) {
         this.resourceService = resourceService;
+        this.fulfillmentService = fulfillmentService;
     }
 
     @GetMapping
@@ -36,6 +40,16 @@ public class AdminResourceController {
     @GetMapping("/{id}")
     public Result<ResourceAdminDetailVO> detail(@PathVariable Long id) {
         return Result.success(resourceService.getAdminResourceDetail(id));
+    }
+
+    @GetMapping("/by-code/{resourceCode}")
+    public Result<ResourceAdminDetailVO> detailByCode(@PathVariable String resourceCode) {
+        return Result.success(resourceService.getAdminResourceDetailByCode(resourceCode));
+    }
+
+    @GetMapping("/quick-search")
+    public Result<java.util.List<FulfillmentQuickSearchItemVO>> quickSearch(@org.springframework.web.bind.annotation.RequestParam String keyword) {
+        return Result.success(fulfillmentService.quickSearch(keyword));
     }
 
     @PostMapping

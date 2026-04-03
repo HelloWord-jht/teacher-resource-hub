@@ -1,7 +1,10 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import { buildAttributedPath } from '../../utils/attribution';
 import styles from './SiteFooter.module.css';
 
 function SiteFooter({ siteName, footerText }) {
+  const location = useLocation();
+
   return (
     <footer className={styles.footer}>
       <div className={styles.inner}>
@@ -11,10 +14,10 @@ function SiteFooter({ siteName, footerText }) {
         </div>
 
         <div className={styles.links}>
-          <Link to="/about">关于我们</Link>
-          <Link to="/contact">联系我们</Link>
-          <Link to="/disclaimer">版权与免责声明</Link>
-          <Link to="/refund-policy">退款/补发说明</Link>
+          <Link to={buildAttributedPath('/about', location.search)}>关于我们</Link>
+          <Link to={buildAttributedPath('/contact', location.search)}>联系我们</Link>
+          <Link to={buildAttributedPath('/disclaimer', location.search)}>版权与免责声明</Link>
+          <Link to={buildAttributedPath('/refund-policy', location.search)}>退款/补发说明</Link>
         </div>
       </div>
     </footer>

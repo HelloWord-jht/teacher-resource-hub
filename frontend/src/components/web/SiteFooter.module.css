@@ -40,6 +40,12 @@
   color: #93c5fd;
 }
 
+.links a:focus-visible {
+  outline: 3px solid rgba(147, 197, 253, 0.3);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
 @media (max-width: 768px) {
   .inner {
     width: calc(100% - 24px);

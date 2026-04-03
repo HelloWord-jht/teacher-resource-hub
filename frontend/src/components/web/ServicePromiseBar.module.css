@@ -1,0 +1,39 @@
+.bar {
+  padding: 18px 20px;
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at top left, rgba(37, 99, 235, 0.14), transparent 34%),
+    #f8fbff;
+  border: 1px solid #dbeafe;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.title {
+  color: #1d4ed8;
+  white-space: nowrap;
+}
+
+.items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.item {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(191, 219, 254, 0.92);
+  color: #1e3a8a;
+  font-size: 13px;
+}
+
+@media (max-width: 768px) {
+  .bar {
+    flex-direction: column;
+  }
+}

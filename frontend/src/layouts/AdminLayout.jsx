@@ -1,5 +1,6 @@
 import { Layout } from 'antd';
 import { Outlet } from 'react-router-dom';
+import FulfillmentDrawer from '../components/admin/FulfillmentDrawer';
 import SideMenu from '../components/admin/SideMenu';
 import TopBar from '../components/admin/TopBar';
 
@@ -23,6 +24,7 @@ function AdminLayout() {
           </div>
         </Layout.Content>
       </Layout>
+      <FulfillmentDrawer />
     </Layout>
   );
 }

@@ -1,5 +1,6 @@
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { Button } from 'antd';
+import { buildAttributedPath, buildResourceListPath } from '../../utils/attribution';
 import styles from './SiteHeader.module.css';
 
 const navList = [
@@ -11,11 +12,21 @@ const navList = [
 
 function SiteHeader({ siteName, onWechatClick }) {
   const location = useLocation();
+  const homePath = buildAttributedPath('/', location.search);
+  const resourcePath = buildResourceListPath(location.search);
+  const aboutPath = buildAttributedPath('/about', location.search);
+  const contactPath = buildAttributedPath('/contact', location.search);
+  const pathMap = {
+    '/': homePath,
+    '/resources': resourcePath,
+    '/about': aboutPath,
+    '/contact': contactPath,
+  };
 
   return (
     <header className={styles.header}>
       <div className={styles.inner}>
-        <Link to="/" className={styles.logo}>
+        <Link to={homePath} className={styles.logo}>
           <span className={styles.logoBadge}>教</span>
           <div>
             <strong>{siteName || '小学课件教案资源导流站'}</strong>
@@ -27,7 +38,7 @@ function SiteHeader({ siteName, onWechatClick }) {
           {navList.map((item) => (
             <NavLink
               key={item.path}
-              to={item.path}
+              to={pathMap[item.path] || item.path}
               end={item.path === '/'}
               className={({ isActive }) =>
                 `${styles.navItem} ${

@@ -19,6 +19,8 @@
 - 微信咨询弹窗与导流
 - 线索提交与后台跟进
 - 后台资源、分类、标签、FAQ、首页配置、站点配置管理
+- 后台上传资料文件并自动生成样张预览
+- ZIP 文件解压、文件侧边栏切换预览、前台仅展示前 2 页样张
 
 ## 技术栈
 
@@ -48,6 +50,7 @@
 - Docker
 - Docker Compose
 - Nginx
+- LibreOffice（已内置到后端容器镜像，用于 Office 转 PDF 样张）
 
 ## 项目结构
 
@@ -75,6 +78,7 @@ docker compose up -d --build
 - MySQL 容器会自动执行 `sql/` 目录下的初始化脚本，完成建表、索引和种子数据导入。
 - 后端镜像会在容器内执行 Maven 打包，首次构建会下载依赖，时间会比后续重建更久一些。
 - 前端镜像会先执行 Vite 构建，再由 Nginx 提供静态站点服务，并代理 `/api` 到后端容器。
+- 预览文件和预览图片会保存在 Compose 的 `preview-data` 数据卷里，重建前后端容器时不会丢失。
 
 启动后访问地址：
 
@@ -117,6 +121,9 @@ docker compose down -v
 1. `sql/01_schema.sql`
 2. `sql/02_indexes.sql`
 3. `sql/03_seed.sql`
+4. `sql/04_preview_schema_upgrade.sql`
+5. `sql/05_preview_indexes.sql`
+6. `sql/06_preview_backfill.sql`
 
 默认数据库配置在 `backend/src/main/resources/application.yml` 中：
 
@@ -189,6 +196,7 @@ docker compose logs -f mysql
 
 - 第一次启动时会自动执行建表、索引和种子数据初始化
 - 如果 MySQL 数据卷已经存在，则不会重复执行初始化脚本
+- 预览图片与上传文件保存在 `preview-data` 数据卷中；若你只重建前后端容器，这些文件不会丢失
 
 如果你希望在服务器上“重新初始化数据库”，可以执行：
 
@@ -197,7 +205,7 @@ docker compose down -v
 docker compose up -d --build
 ```
 
-这会删除当前 MySQL 数据卷并重新导入初始数据，请务必确认没有生产数据再执行。
+这会同时删除当前 MySQL 数据卷和预览文件数据卷，并重新导入初始数据，请务必确认没有生产数据再执行。
 
 ### 服务器默认端口
 
@@ -254,6 +262,19 @@ sudo ufw allow 8080/tcp
 - 13 条可直接展示的资源数据
 - 首页配置、站点配置、固定页面内容
 - 示例线索数据
+
+预览相关增量表：
+
+- `resource_file`
+- `resource_file_preview`
+- `resource_file_process_log`
+
+预览链路说明：
+
+- 后台上传 `pdf / ppt / pptx / doc / docx / 图片 / zip / txt / md`
+- ZIP 会先安全解压，再对子文件逐个识别
+- 前台与后台统一只展示前 2 页 / 前 2 张样张
+- 前台不会暴露真实源文件路径，只消费预览结果
 
 数据库设计说明文件：
 

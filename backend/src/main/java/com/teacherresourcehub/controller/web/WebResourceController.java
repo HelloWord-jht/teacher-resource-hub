@@ -31,4 +31,9 @@ public class WebResourceController {
     public Result<ResourceDetailVO> detail(@PathVariable Long id) {
         return Result.success(resourceService.getWebResourceDetail(id));
     }
+
+    @GetMapping("/by-code/{resourceCode}")
+    public Result<ResourceDetailVO> detailByCode(@PathVariable String resourceCode) {
+        return Result.success(resourceService.getWebResourceDetailByCode(resourceCode));
+    }
 }
